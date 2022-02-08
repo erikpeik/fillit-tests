@@ -1,4 +1,18 @@
 #!/bin/bash
-PATH=$(<path.ini)
-echo $PATH
-make
+
+FILLIT_PATH=`cat path.ini`
+echo $FILLIT_PATH
+
+function main()
+{
+	$FILLIT_PATH/./fillit valid_tests/valid_7.test
+}
+
+function make_reclean()
+{
+	make re -C $FILLIT_PATH
+	make clean -C $FILLIT_PATH
+}
+
+make_reclean
+main
