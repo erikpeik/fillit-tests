@@ -1,17 +1,29 @@
 #!/bin/bash
 
 FILLIT_PATH=`cat path.ini`
-echo $FILLIT_PATH
+echo fillit path: $FILLIT_PATH
 
 function main()
 {
-	$FILLIT_PATH/./fillit valid_tests/valid_7.test
+	if [ ! -f "$FILLIT_PATH/fillit" ]; then
+		echo "$(tput setab 1)Can't find fillit$(tput setab 7)"
+		exit 1
+	fi
+	$FILLIT_PATH/fillit valid_tests/valid_7.test
 }
 
 function make_reclean()
-{
+{	if [ ! -d "$FILLIT_PATH" ]; then
+		echo "$(tput setab 1)Folder doesn't exist.$(tput setab 7)"
+		exit 1
+	fi
+	if [ ! -f "$FILLIT_PATH/Makefile" ]; then
+		echo "$(tput setab 1)Makefile doesn't exist.$(tput setab 7)"
+		exit 1
+	fi
 	make re -C $FILLIT_PATH
 	make clean -C $FILLIT_PATH
+	tput setaf 7
 }
 
 make_reclean
