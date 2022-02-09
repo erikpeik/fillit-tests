@@ -5,11 +5,13 @@ echo fillit path: $FILLIT_PATH
 
 function main()
 {
+	make_reclean
 	if [ ! -f "$FILLIT_PATH/fillit" ]; then
 		echo "$(tput setab 1)Can't find fillit$(tput setab 7)"
 		exit 1
 	fi
-	$FILLIT_PATH/fillit valid_tests/valid_7.test
+	test valid "
+#	$FILLIT_PATH/fillit valid_tests/valid_7.test
 }
 
 function make_reclean()
@@ -26,5 +28,4 @@ function make_reclean()
 	tput setaf 7
 }
 
-make_reclean
 main
