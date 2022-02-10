@@ -1,16 +1,25 @@
 #!/bin/bash
 
-FILLIT_PATH=`cat path.ini`
-echo fillit path: $FILLIT_PATH
+# GITHUB: github.com/erikpeik/fillit-tests
 
-function main()
+FILLIT_PATH=`cat path.ini`
+
+LBLUE='\033[1;34m'
+WHITE='\033[1;37m'
+GREEN='\033[0;32m'
+LGREEN='\033[1;32m'
+RED='\033[0;31m'
+
+printf "${WHITE}fillit path:$(tput sgr0) $LBLUE$FILLIT_PATH\n"
+
+function easy()
 {
 	if [ ! -f "$FILLIT_PATH/fillit" ]; then
-		echo "$(tput setab 1)Can't find fillit$(tput setab 7)"
-		exit 1
+		make_reclean
 	fi
 #	test valid "valid_tests/valid_" 14 "echo "error"" 0
 	cd valid_tests/
+	tput sgr0
 	for file in easy_*
 	do
 #		echo "compere_tests/output_$file"
@@ -27,7 +36,10 @@ function main()
 			echo -n "$(tput setaf 2)$file	: $(tput sgr0)"
 			echo "$(tput setab 2)$(tput bold)OK!$(tput sgr0)"
 		fi
-#		time $FILLIT_PATH/fillit $PWD/$file | grep "user"
+#		echo "$#"
+		if [ $# -gt 0 ] && [ $1 -eq 1 ]; then
+			time $FILLIT_PATH/fillit $PWD/$file | grep "user"
+		fi
 #		echo "$yours"
 #		echo "$correct"
 	done
@@ -46,12 +58,17 @@ function make_reclean()
 	make re -C $FILLIT_PATH
 	make clean -C $FILLIT_PATH
 	tput setaf 7
+	if [ ! -f "$FILLIT_PATH/fillit" ]; then
+		echo "$(tput setab 1)Can't find fillit$(tput setab 7)"
+		exit 1
+	fi
 }
 
 if [ $# -eq 0 ]; then
 	echo "$(tput setaf 1)No arguments provided...$(tput sgr0)"
-	echo -n "$(tput setab 7)$(tput setaf 0)./run.test make$(tput sgr0)"
-	echo "$(tput bold) make re & make clean"
+	printf "${WHITE}./test.sh make ${GREEN}make re && make clean$(tput sgr0)\n\n"
+	printf "${RED}usage: ${WHITE}/test.sh [difficulty] [0 = no time / 1 = with time]\n"
+	printf "${WHITE}./test.sh easy [0/1] ${GREEN}run easy test files.\n"
 	exit 1
 fi
 
@@ -60,4 +77,7 @@ if [ $1 = "make" ]; then
 	exit 1
 fi
 
-
+if [ $1 = "easy" ]; then
+	easy $2
+	exit 1
+fi
