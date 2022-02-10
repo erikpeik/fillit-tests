@@ -10,7 +10,11 @@ function main()
 		echo "$(tput setab 1)Can't find fillit$(tput setab 7)"
 		exit 1
 	fi
-	test valid "valid_tests/valid_" 14 "echo "error"" 0
+#	test valid "valid_tests/valid_" 14 "echo "error"" 0
+	for file in valid_tests/valid_*
+	do
+		$FILLIT_PATH/fillit $file
+	done
 #	$FILLIT_PATH/fillit valid_tests/valid_7.test
 }
 
