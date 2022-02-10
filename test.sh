@@ -5,7 +5,6 @@ echo fillit path: $FILLIT_PATH
 
 function main()
 {
-	make_reclean
 	if [ ! -f "$FILLIT_PATH/fillit" ]; then
 		echo "$(tput setab 1)Can't find fillit$(tput setab 7)"
 		exit 1
@@ -49,4 +48,16 @@ function make_reclean()
 	tput setaf 7
 }
 
-main
+if [ $# -eq 0 ]; then
+	echo "$(tput setaf 1)No arguments provided...$(tput sgr0)"
+	echo -n "$(tput setab 7)$(tput setaf 0)./run.test make$(tput sgr0)"
+	echo "$(tput bold) make re & make clean"
+	exit 1
+fi
+
+if [ $1 = "make" ]; then
+	make_reclean
+	exit 1
+fi
+
+
