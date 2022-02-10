@@ -11,7 +11,7 @@ function main()
 		exit 1
 	fi
 #	test valid "valid_tests/valid_" 14 "echo "error"" 0
-	for file in valid_tests/valid_*
+	for file in valid_tests/easy_*
 	do
 		$FILLIT_PATH/fillit $file
 	done
