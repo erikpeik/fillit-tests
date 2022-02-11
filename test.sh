@@ -42,6 +42,7 @@ function easy()
 		fi
 		if [ $# -gt 1 ] && [ $2 -eq 1 ]; then
 			cd ..
+			mkdir $PWD/valgrind_logs/ > /dev/null 2>&1
 			rm -f $PWD/valgrind_logs/log_$file
 			valgrind --log-file="$PWD/valgrind_logs/log_$file" $FILLIT_PATH/fillit $PWD/valid_tests/$file > /dev/null 2>&1
 			cat "$PWD/valgrind_logs/log_$file" | grep "lost"
