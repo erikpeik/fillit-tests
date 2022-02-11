@@ -17,15 +17,12 @@ function easy()
 	if [ ! -f "$FILLIT_PATH/fillit" ]; then
 		make_reclean
 	fi
-#	test valid "valid_tests/valid_" 14 "echo "error"" 0
 	cd valid_tests/
 	tput sgr0
 	for file in easy_*
 	do
-#		echo "compere_tests/output_$file"
 		yours=$($FILLIT_PATH/fillit $file)
 		cd ..
-#		echo "$PWD/copere_tests/output_$file" 
 		correct=$(<$PWD/compare_tests/output_$file)
 		cd valid_tests/
 		if [ "$yours" != "$correct" ]
@@ -36,7 +33,6 @@ function easy()
 			echo -n "$(tput setaf 2)$file	: $(tput sgr0)"
 			echo "$(tput setab 2)$(tput bold)OK!$(tput sgr0)"
 		fi
-#		echo "$#"
 		if [ $# -gt 0 ] && [ $1 -eq 1 ]; then
 			time $FILLIT_PATH/fillit $PWD/$file | grep "user"
 		fi
@@ -46,13 +42,9 @@ function easy()
 			rm -f $PWD/valgrind_logs/log_$file
 			valgrind --log-file="$PWD/valgrind_logs/log_$file" $FILLIT_PATH/fillit $PWD/valid_tests/$file > /dev/null 2>&1
 			cat "$PWD/valgrind_logs/log_$file" | grep "lost"
-#			valgrind --log-fd=1 $FILLIT_PATH/fillit $PWD/valid_tests/$file | grep "lost" #| grep "LEAK"
 			cd valid_tests/
 		fi
-#		echo "$yours"
-#		echo "$correct"
 	done
-#	$FILLIT_PATH/fillit valid_tests/valid_7.test
 }
 
 function make_reclean()
@@ -88,5 +80,10 @@ fi
 
 if [ $1 = "easy" ]; then
 	easy $2 $3
+	exit 1
+fi
+
+if [ $1 = "invalid" ]; then
+	invalid
 	exit 1
 fi
