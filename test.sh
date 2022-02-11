@@ -3,7 +3,7 @@
 # GITHUB: github.com/erikpeik/fillit-tests
 
 FILLIT_PATH=`cat path.ini`
-
+TEST_PATH=$PWD
 LBLUE='\033[1;34m'
 WHITE='\033[1;37m'
 GREEN='\033[0;32m'
@@ -39,6 +39,14 @@ function easy()
 #		echo "$#"
 		if [ $# -gt 0 ] && [ $1 -eq 1 ]; then
 			time $FILLIT_PATH/fillit $PWD/$file | grep "user"
+		fi
+		if [ $# -gt 1 ] && [ $2 -eq 1 ]; then
+			cd ..
+			rm -f $PWD/valgrind_logs/log_$file
+			valgrind --log-file="$PWD/valgrind_logs/log_$file" $FILLIT_PATH/fillit $PWD/valid_tests/$file > /dev/null 2>&1
+			cat "$PWD/valgrind_logs/log_$file" | grep "lost"
+#			valgrind --log-fd=1 $FILLIT_PATH/fillit $PWD/valid_tests/$file | grep "lost" #| grep "LEAK"
+			cd valid_tests/
 		fi
 #		echo "$yours"
 #		echo "$correct"
@@ -78,6 +86,6 @@ if [ $1 = "make" ]; then
 fi
 
 if [ $1 = "easy" ]; then
-	easy $2
+	easy $2 $3
 	exit 1
 fi
