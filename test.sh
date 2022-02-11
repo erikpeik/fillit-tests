@@ -12,6 +12,15 @@ RED='\033[0;31m'
 
 printf "${WHITE}fillit path:$(tput sgr0) $LBLUE$FILLIT_PATH\n"
 
+function valid_compare()
+{
+	echo "$(tput setab 4)YOUR RESULT:$(tput sgr0)"
+	echo "$($FILLIT_PATH/fillit $TEST_PATH/valid_tests/$1)"
+	echo 
+	echo "$(tput setab 1)COMPAIRED RESULT:$(tput sgr0)"
+	cat "$TEST_PATH/compare_tests/output_$file"
+}
+
 function easy()
 {
 	if [ ! -f "$FILLIT_PATH/fillit" ]; then
@@ -28,7 +37,8 @@ function easy()
 		if [ "$yours" != "$correct" ]
 		then
 			echo -n "$(tput setaf 1)$file	: $(tput sgr0)"
-			echo "$(tput setab 2)$(tput bold)FAIL$(tput sgr0)"
+			echo "$(tput setab 1)$(tput bold)FAIL$(tput sgr0)"
+			valid_compare $file
 		else
 			echo -n "$(tput setaf 2)$file	: $(tput sgr0)"
 			echo "$(tput setab 2)$(tput bold)OK!$(tput sgr0)"
@@ -41,9 +51,24 @@ function easy()
 			mkdir $PWD/valgrind_logs/ > /dev/null 2>&1
 			rm -f $PWD/valgrind_logs/log_$file
 			valgrind --log-file="$PWD/valgrind_logs/log_$file" $FILLIT_PATH/fillit $PWD/valid_tests/$file > /dev/null 2>&1
-			cat "$PWD/valgrind_logs/log_$file" | grep "lost"
+			cat "$PWD/valgrind_logs/log_$file" | grep -E "definitely lost|indirectly lost|possibly lost|still reachable"
 			cd valid_tests/
 		fi
+	done
+}
+
+function invalid()
+{
+	if [ ! -f "$FILLIT_PATH/fillit" ]; then
+		make_reclean
+	fi
+	cd invalid_tests/
+	tput sgr0
+	for file in invalid_*
+	do
+		diff=$($FILLIT_PATH/fillit $file)
+		cd ..
+		
 	done
 }
 
