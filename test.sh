@@ -4,6 +4,8 @@
 
 FILLIT_PATH=`cat path.ini`
 TEST_PATH=$PWD
+INVALID_PATH=$PWD/invalid_tests
+
 LBLUE='\033[1;34m'
 WHITE='\033[1;37m'
 GREEN='\033[0;32m'
@@ -18,7 +20,16 @@ function valid_compare()
 	echo "$($FILLIT_PATH/fillit $TEST_PATH/valid_tests/$1)"
 	echo 
 	echo "$(tput setab 1)COMPAIRED RESULT:$(tput sgr0)"
-	cat "$TEST_PATH/compare_tests/output_$file"
+	cat "$TEST_PATH/compare_tests/output_$1"
+}
+
+function invalid_compare()
+{
+	echo "$(tput setab 4)YOUR RESULT:$(tput sgr0)"
+	echo "$($FILLIT_PATH/fillit $TEST_PATH/invalid_tests/$1)"
+	echo 
+	echo "$(tput setab 1)COMPAIRED RESULT:$(tput sgr0)"
+	echo "error"
 }
 
 function easy()
@@ -57,6 +68,41 @@ function easy()
 	done
 }
 
+function medium()
+{
+	if [ ! -f "$FILLIT_PATH/fillit" ]; then
+		make_reclean
+	fi
+	echo "$(tput bold)$(tput setaf 1)MEDIUM TEST $(tput setaf 0)| $(tput setaf 7)EXTIMATED TIME 10 sec$(tput sgr0) "
+	yours=$($FILLIT_PATH/fillit $TEST_PATH/valid_tests/medium_0)
+	correct=$(<$TEST_PATH/compare_tests/output_medium_0)
+	if [ "$yours" != "$correct" ]
+	then
+		echo -n "$(tput setaf 1)medium_0	: $(tput sgr0)"
+		echo "$(tput setab 1)$(tput bold)FAIL$(tput sgr0)"
+		valid_compare medium_0
+		exit 1
+	else
+		echo -n "$(tput setaf 2)medium_0	: $(tput sgr0)"
+		echo "$(tput setab 2)$(tput bold)OK!$(tput sgr0)"
+		echo 
+		echo "$yours"
+	fi
+	echo "$(tput bold)$(tput setaf 4)Do you wan't run it again with timer? $(tput setaf 2)(yes/no)$(tput sgr0)"
+	read timer
+	if [ "$timer" ==  "yes" ]; then
+		time $FILLIT_PATH/fillit $TEST_PATH/valid_tests/medium_0 | grep "user"
+	fi
+	echo "$(tput bold)$(tput setaf 4)Do you want run it with valgrind? $(tput setaf 2)(yes/no)$(tput sgr0)"
+	read val
+	if [ "$val" == "yes" ]; then
+		mkdir $TEST_PATH/valgrind_logs/ > /dev/null 2>&1
+		rm -f $TEST_PATH/valgrind_logs/log_medium_0
+		valgrind --log-file="$TEST_PATH/valgrind_logs/log_medium_0" $FILLIT_PATH/fillit $TEST_PATH/valid_tests/medium_0 > /dev/null 2>&1
+		cat "$TEST_PATH/valgrind_logs/log_medium_0" | grep -E "definitely lost|indirectly lost|possibly lost|still reachable"
+	fi
+}
+
 function invalid()
 {
 	if [ ! -f "$FILLIT_PATH/fillit" ]; then
@@ -66,9 +112,21 @@ function invalid()
 	tput sgr0
 	for file in invalid_*
 	do
-		diff=$($FILLIT_PATH/fillit $file)
-		cd ..
-		
+		diff=$($FILLIT_PATH/fillit $PWD/$file)
+#		echo $diff
+		if [ "$diff" != "error" ]; then
+			echo -n "$(tput setaf 1)$file	: $(tput sgr0)"
+			echo "$(tput setab 1)$(tput bold)FAIL$(tput sgr0)"
+		else
+			echo -n "$(tput setaf 2)$file	: $(tput sgr0)"
+			echo "$(tput setab 2)$(tput bold)OK!$(tput sgr0)"
+		fi
+		if [ $# -gt 0 ] && [ $1 -eq 1 ]; then
+			mkdir $TEST_PATH/valgrind_logs/ > /dev/null 2>&1
+			rm -f $TEST_PATH/valgrind_logs/log_$file
+			valgrind --log-file="$TEST_PATH/valgrind_logs/log_$file" $FILLIT_PATH/fillit $TEST_PATH/invalid_tests/$file > /dev/null 2>&1
+			cat "$TEST_PATH/valgrind_logs/log_$file" | grep -E "definitely lost|indirectly lost|possibly lost|still reachable"
+		fi
 	done
 }
 
@@ -109,6 +167,11 @@ if [ $1 = "easy" ]; then
 fi
 
 if [ $1 = "invalid" ]; then
-	invalid
+	invalid $2
+	exit 1
+fi
+
+if [ $1 = "medium" ]; then
+	medium $2
 	exit 1
 fi
