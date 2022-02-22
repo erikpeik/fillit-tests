@@ -73,7 +73,7 @@ function medium()
 	if [ ! -f "$FILLIT_PATH/fillit" ]; then
 		make_reclean
 	fi
-	echo "$(tput bold)$(tput setaf 1)MEDIUM TEST $(tput setaf 0)| $(tput setaf 7)EXTIMATED TIME 10 sec$(tput sgr0) "
+	echo "$(tput bold)$(tput setaf 1)MEDIUM TEST $(tput setaf 0)| $(tput setaf 7)ESTIMATED TIME 10 sec$(tput sgr0) "
 	yours=$($FILLIT_PATH/fillit $TEST_PATH/valid_tests/medium_0)
 	correct=$(<$TEST_PATH/compare_tests/output_medium_0)
 	if [ "$yours" != "$correct" ]
@@ -102,6 +102,26 @@ function medium()
 		cat "$TEST_PATH/valgrind_logs/log_medium_0" | grep -E "definitely lost|indirectly lost|possibly lost|still reachable"
 	fi
 }
+
+function hard()
+{
+	if [ ! -f "$FILLIT_PATH/fillit" ]; then
+		make_reclean
+	fi
+	echo "$(tput bold)$(tput setaf 1)HARD/MAX TEST $(tput setaf 0)| $(tput setaf 7)ESTIMATED TIME 3-5 min$(tput sgr0)"
+#	yours=$($FILLIT_PATH/fillit $TEST_PATH/valid_tests/hard_max)
+#	correct=$(<$TEST_PATH/compare_tests/output_hard_max)
+	time $FILLIT_PATH/fillit $TEST_PATH/valid_tests/hard_max
+	echo "$(tput bold)$(tput setaf 4)Do you want run it with valgrind? $(tput setaf 2)(yes/no)$(tput sgr0)"
+	read val
+	if [ "$val" == "yes" ]; then
+		mkdir $TEST_PATH/valgrind_logs/ > /dev/null 2>&1
+		rm -f $TEST_PATH/valgrind_logs/log_hard_max
+		valgrind --log-file="$TEST_PATH/valgrind_logs/log_hard_max" $FILLIT_PATH/fillit $TEST_PATH/valid_tests/hard_max > /dev/null 2>&1
+		cat "$TEST_PATH/valgrind_logs/log_hard_max" | grep -E "definitely lost|indirectly lost|possibly lost|still reachable"
+	fi
+}
+
 
 function invalid()
 {
@@ -173,5 +193,10 @@ fi
 
 if [ $1 = "medium" ]; then
 	medium $2
+	exit 1
+fi
+
+if [ $1 = "hard" ]; then
+	hard
 	exit 1
 fi
