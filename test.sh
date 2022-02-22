@@ -171,8 +171,10 @@ function make_reclean()
 if [ $# -eq 0 ]; then
 	echo "$(tput setaf 1)No arguments provided...$(tput sgr0)"
 	printf "${WHITE}./test.sh make ${GREEN}make re && make clean$(tput sgr0)\n\n"
-	printf "${RED}usage: ${WHITE}/test.sh [difficulty] [0 = no time / 1 = with time]\n"
-	printf "${WHITE}./test.sh easy [0/1] ${GREEN}run easy test files.\n"
+	printf "${RED}usage: ${WHITE}/test.sh [difficulty]\n"
+	printf "${WHITE}./test.sh easy [0/1 time] [0/1 valgrind] ${GREEN}run easy test files.\n"
+	printf "${WHITE}./test.sh medium ${GREEN}run medium test file.\n"
+	printf "${WHITE}./test.sh hard ${GREEN}run hard test file.\n"
 	exit 1
 fi
 
